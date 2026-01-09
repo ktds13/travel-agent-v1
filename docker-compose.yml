@@ -1,0 +1,129 @@
+version: '3.8'
+
+services:
+  # PostgreSQL database with pgvector extension
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: travel-agent-db
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-travel_db}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - travel-agent-network
+
+  # SQL Server (alternative to PostgreSQL if needed)
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: travel-agent-sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: ${SQL_PASSWORD:-YourStrong@Passw0rd}
+      MSSQL_PID: ${SQL_EDITION:-Express}
+    ports:
+      - "${SQL_PORT:-1433}:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P ${SQL_PASSWORD:-YourStrong@Passw0rd} -Q 'SELECT 1'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - travel-agent-network
+    profiles:
+      - sqlserver
+
+  # Travel Agent Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: travel-agent-app
+    environment:
+      # Database Configuration
+      DB_HOST: ${DB_HOST:-postgres}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_NAME: ${DB_NAME:-travel_db}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      
+      # Azure OpenAI Configuration
+      AZURE_OPENAI_API_KEY: ${AZURE_OPENAI_API_KEY}
+      AZURE_OPENAI_ENDPOINT: ${AZURE_OPENAI_ENDPOINT}
+      AZURE_OPENAI_DEPLOYMENT: ${AZURE_OPENAI_DEPLOYMENT:-gpt-4}
+      AZURE_OPENAI_API_VERSION: ${AZURE_OPENAI_API_VERSION:-2024-02-15-preview}
+      
+      # Groq Configuration
+      GROQ_API_KEY: ${GROQ_API_KEY}
+      
+      # Embedding Model
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-sentence-transformers/LaBSE}
+      
+      # Application Settings
+      PYTHONUNBUFFERED: 1
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    volumes:
+      - ./logs:/app/logs
+      - ./data:/app/data
+      - model_cache:/root/.cache
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - travel-agent-network
+    restart: unless-stopped
+    command: uvicorn api:app --host 0.0.0.0 --port 8000
+
+  # Data Ingestion Service (optional, for batch processing)
+  data-ingestion:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: travel-agent-data-ingestion
+    environment:
+      DB_HOST: ${DB_HOST:-postgres}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_NAME: ${DB_NAME:-travel_db}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      AZURE_OPENAI_API_KEY: ${AZURE_OPENAI_API_KEY}
+      AZURE_OPENAI_ENDPOINT: ${AZURE_OPENAI_ENDPOINT}
+      GROQ_API_KEY: ${GROQ_API_KEY}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-sentence-transformers/LaBSE}
+    volumes:
+      - ./logs:/app/logs
+      - ./data:/app/data
+      - model_cache:/root/.cache
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - travel-agent-network
+    restart: "no"
+    command: python main_data.py
+    profiles:
+      - data-ingestion
+
+volumes:
+  postgres_data:
+    driver: local
+  sqlserver_data:
+    driver: local
+  model_cache:
+    driver: local
+
+networks:
+  travel-agent-network:
+    driver: bridge
