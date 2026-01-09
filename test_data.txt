@@ -1,0 +1,86 @@
+RAW_PARAGRAPHS = [
+    # 🇲🇲 Myanmar
+    """Ngapali Beach is one of the most beautiful beaches in Myanmar.
+    It is famous for white sand, blue sea, and peaceful sunsets.
+    Many tourists enjoy swimming, seafood, and relaxing here.""",
+
+    """ပုဂံသည် မြန်မာနိုင်ငံရှိ သမိုင်းဝင်မြို့တစ်မြို့ဖြစ်ပြီး
+    ဘုရားပုထိုးများစွာရှိသည်။ ခရီးသွားများအတွက် အလွန်အရေးပါသောနေရာဖြစ်သည်။""",
+
+    """ချောင်းသာကမ်းခြေသည် မြန်မာနိုင်ငံ အရေးဝဒ္ဓနီတိုင်းဒေသကြီးတွင်
+    တည်ရှိသော လူကြိုက်များသည့် ပင်လယ်ကမ်းခြေတစ်ခုဖြစ်သည်။
+    မိသားစုအပန်းဖြေခရီးများအတွက် သင့်တော်သည်။""",
+
+    # 🇹🇭 Thailand
+    """Chiang Mai is a city in northern Thailand surrounded by mountains.
+    It is popular for hiking, temples, and cultural experiences.""",
+
+    """Doi Inthanon National Park near Chiang Mai is famous for
+    hiking trails, waterfalls, and cool weather.""",
+
+    """Phuket is a popular island in Thailand known for beaches,
+    water sports, and nightlife.""",
+
+    # 🇯🇵 Japan
+    """Mount Fuji is the highest mountain in Japan.
+    Many travelers hike Mount Fuji during the summer season.""",
+
+    """Kyoto is a historic city in Japan with many temples,
+    shrines, and traditional culture.""",
+
+    # 🇪🇸 Spain
+    """Barcelona is a vibrant city in Spain.
+    It is known for beaches, architecture, and food."""
+]
+
+RAW = """
+Chiang Mai is an excellent base for a one-week hiking trip in northern Thailand, offering access to mountains, forests, waterfalls, and national parks. A good starting point is a short warm-up hike along the Monk’s Trail to Wat Pha Lat, a peaceful forest temple near the city with scenic views, and hikers can continue up to Doi Suthep if they want a longer walk. One of the highlights of the week is Doi Inthanon National Park, located about two hours from Chiang Mai, where visitors can hike the Kew Mae Pan Nature Trail, explore Ang Ka Nature Trail, and visit famous waterfalls such as Wachirathan and Siriphum while enjoying the cool mountain climate. For experienced hikers, Chiang Dao Mountain north of Chiang Mai offers a challenging guided summit hike with panoramic views and alpine scenery, and many travelers stay overnight in Chiang Dao village to recover. After the strenuous climb, lighter activities such as visiting Chiang Dao Cave, walking through local villages, or relaxing in hot springs provide a good recovery day. Another scenic hiking area is Mae Kampong, a small mountain village east of Chiang Mai known for forest trails, waterfalls, coffee shops, and a slow-paced lifestyle surrounded by lush greenery. South of Chiang Mai, Ob Khan National Park features canyon and river trails, while Pha Chor offers unusual erosion formations suitable for moderate half-day hikes. On the final day, hikers can choose easy nature walks around Huay Tung Tao Lake, explore the Queen Sirikit Botanic Garden skywalk, or relax in the city before departure. This itinerary works best from November to February when temperatures are cooler, although some trails may be closed during the rainy season.
+"""
+
+Chiang Mai (Base City)
+
+Chiang Mai is an ideal base for hiking in northern Thailand, surrounded by mountains, forests, and national parks. The city offers easy access to short forest trails, cultural sites, and day trips to nearby hiking destinations, making it suitable for both beginner and experienced hikers. Many travelers use Chiang Mai as a starting and ending point for multi-day hiking itineraries in the region.
+
+Monk’s Trail & Wat Pha Lat
+
+The Monk’s Trail is a popular forest hiking path near Chiang Mai that leads to Wat Pha Lat, a peaceful temple hidden in the jungle. The trail is moderately easy and shaded, making it a good warm-up hike. Hikers can continue uphill to Doi Suthep for a longer trek, enjoying scenic viewpoints and natural surroundings along the way.
+
+Doi Inthanon National Park
+
+Doi Inthanon National Park, located southwest of Chiang Mai, is famous for its cool climate, mountain scenery, and diverse hiking trails. Popular routes include the Kew Mae Pan Nature Trail and Ang Ka Nature Trail, which pass through cloud forests and high-altitude ecosystems. The park is also known for its large waterfalls such as Wachirathan and Siriphum, making it a highlight for nature and hiking enthusiasts.
+
+Chiang Dao Mountain
+
+Chiang Dao Mountain lies north of Chiang Mai and offers one of the most challenging hikes in the region. The summit trek usually requires a licensed guide and rewards hikers with panoramic views, alpine landscapes, and unique limestone formations. Many visitors stay overnight in Chiang Dao village to rest after the climb and explore nearby natural attractions.
+
+Chiang Dao Cave & Village
+
+Chiang Dao Cave is a well-known limestone cave system near Chiang Dao village. After hiking the mountain, visitors often explore the cave or enjoy relaxed walks around the village. The area provides a slower pace and is suitable for recovery days with light outdoor activities.
+
+Mae Kampong Village
+
+Mae Kampong is a small mountain village east of Chiang Mai, surrounded by dense forest and cool weather. The area is known for gentle hiking trails, nearby waterfalls, and scenic viewpoints. Visitors often combine hiking with village walks, local coffee shops, and homestay experiences in a tranquil natural setting.
+
+Ob Khan National Park
+
+Ob Khan National Park, located south of Chiang Mai, features river gorges, rocky cliffs, and forest trails. The park is suitable for moderate half-day hikes and offers scenic views along the canyon and river. It is a less crowded alternative to larger national parks.
+
+Pha Chor
+
+Pha Chor is a natural erosion formation within Mae Wang National Park, characterized by tall clay pillars and narrow pathways. The area offers short, easy-to-moderate hiking trails and is often combined with visits to nearby rivers and rural landscapes.
+
+Huay Tung Tao Lake
+
+Huay Tung Tao Lake is a peaceful recreational area near Chiang Mai with flat walking paths and mountain views. It is ideal for easy walks and relaxation after more demanding hikes. The area is popular for picnics and casual outdoor activities.
+
+Queen Sirikit Botanic Garden
+
+Queen Sirikit Botanic Garden, located north of Chiang Mai, offers landscaped gardens, nature trails, and a canopy skywalk. Visitors can enjoy light hiking while learning about native plant species. It is a good option for a relaxed final day before departure.
+
+The Shwedagon Pagoda is the most sacred and iconic Buddhist monument in Myanmar, located in Yangon. Rising majestically to a height of about 99 meters, the golden stupa is said to enshrine sacred relics of four Buddhas, including strands of hair from Gautama Buddha. Covered in thousands of gold plates and adorned with precious gems, the pagoda glows brilliantly, especially at sunrise and sunset. Shwedagon is not only a place of worship but also a spiritual and cultural center, attracting pilgrims and visitors from around the world who come to pray, meditate, and admire its timeless beauty and deep religious significance.
+
+The Merlion is the iconic national symbol of Singapore, featuring a mythical creature with the head of a lion and the body of a fish. The lion head represents Singapore’s original name, Singapura, meaning “Lion City,” while the fish body symbolizes the city’s humble beginnings as a fishing village. The most famous Merlion statue is located at Merlion Park, overlooking Marina Bay, where it has become a popular landmark for visitors. Spouting water into the bay, the Merlion represents Singapore’s heritage, strength, and connection to the sea.
+
+ချောင်းသာကမ်းခြေသည် မြန်မာနိုင်ငံ အရေးဝဒ္ဓနီတိုင်းဒေသကြီးတွင် တည်ရှိသော လူကြိုက်များသည့် ပင်လယ်ကမ်းခြေတစ်ခုဖြစ်သည်။ သဲဖြူနုနုများ၊ ပင်လယ်ရေအပြာရောင်နှင့် လှိုင်းသံသေးသေးများကြောင့် အေးချမ်းလှပသော အပန်းဖြေရာနေရာတစ်ခုအဖြစ် လူသိများသည်။ မိသားစုအပန်းဖြေခရီးများ၊ သူငယ်ချင်းများနှင့် အပျော်ခရီးထွက်ရန် သင့်တော်ပြီး နေရောင်ခြည်ခံစားခြင်း၊ ပင်လယ်ရေကူးခြင်း၊ လှေစီးခြင်းနှင့် ပင်လယ်စာလတ်ဆတ်များကို သုံးဆောင်နိုင်သည်။ နေဝင်ချိန်တွင် ပင်လယ်ပေါ်သို့ ထွန်းလင်းလှပသော နေရောင်ခြည်အလှကို ကြည့်ရှုနိုင်ပြီး စိတ်အပန်းပြေစေသော အမှတ်တရများကို ပေးစွမ်းသော ကမ်းခြေတစ်ခုဖြစ်သည်။
+
+ดอยคำ เป็นพื้นที่ที่มีชื่อเสียงด้านธรรมชาติและเกษตรกรรม ตั้งอยู่ท่ามกลางภูเขาและป่าไม้ที่อุดมสมบูรณ์ บรรยากาศเงียบสงบ อากาศเย็นสบาย เหมาะสำหรับการพักผ่อนและท่องเที่ยวเชิงธรรมชาติ พื้นที่รอบ ๆ มีสวนเกษตรและแหล่งเรียนรู้เกี่ยวกับการปลูกพืชตามแนวพระราชดำริ นักท่องเที่ยวสามารถเพลิดเพลินกับทิวทัศน์ของภูเขา วิถีชีวิตชุมชน และเลือกซื้อผลิตภัณฑ์ท้องถิ่นที่มีคุณภาพ เช่น ผลไม้แปรรูปและผลิตภัณฑ์จากธรรมชาติ
