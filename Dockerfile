@@ -10,8 +10,6 @@ RUN apt-get update && apt-get install -y \
     g++ \
     unixodbc \
     unixodbc-dev \
-    odbcinst \
-    odbcinst1debian2 \
     libpq-dev \
     gnupg \
     curl \
