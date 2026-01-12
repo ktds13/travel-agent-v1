@@ -2,22 +2,19 @@
 
 import os
 from dotenv import load_dotenv
-from agents import create_travel_agent
+from agents import create_travel_agent_for_query
 load_dotenv()
 
 def main():
     """Run the Travel Agent interactive REPL."""
     print("=" * 80)
-    print("TRAVEL AGENT v2.0")
+    print("TRAVEL AGENT v2.0 - Mode-Based Agent System")
     print("=" * 80)
-    print("Creating travel planning agent...")
+    print("Agent will automatically select the best mode for your query.")
+    print("Available modes: itinerary, suggest_places, describe_place, activity_focused, comparison")
+    print("\nType 'exit' or 'quit' to end the session.\n")
     
     deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME", "")
-    max_steps = int(os.getenv("TRAVEL_AGENT_MAX_STEPS", "12"))
-    agent = create_travel_agent(deployment_name=deployment_name, max_steps=max_steps)
-    
-    print("Agent ready! Ask me anything about travel planning.")
-    print("Type 'exit' or 'quit' to end the session.\n")
     
     while True:
         try:
@@ -29,6 +26,10 @@ def main():
             
             if not query.strip():
                 continue
+            
+            print("\nCreating mode-specific agent...")
+            agent, mode = create_travel_agent_for_query(query, deployment_name)
+            print(f"Mode detected: {mode}")
             
             print("\nTravel Agent:")
             result = agent.run(query)

@@ -1,7 +1,10 @@
 """Travel Agent implementation using Tool Calling Agent."""
 
+from typing import Optional
 from smolagents import ToolCallingAgent
 from core.models import get_azure_model
+from utils.intent import classify_generation_mode
+from .factory import create_agent_for_mode, get_mode_from_string, GenerationMode
 from .tools.travel_tools import (
     extract_travel_query,
     generate_travel_itinerary,
@@ -76,3 +79,58 @@ def create_travel_agent(deployment_name: str = None, max_steps: int = 12) -> Too
     )
 
     return agent
+
+
+def create_travel_agent_for_query(
+    query: str,
+    deployment_name: Optional[str] = None,
+    mode: Optional[str] = None
+) -> tuple[ToolCallingAgent, str]:
+    """
+    Create a mode-specific travel agent optimized for the user's query.
+    
+    This function classifies the user's intent and creates an agent
+    with only the tools necessary for that specific task, improving
+    efficiency and reducing token usage.
+
+    Args:
+        query: The user's travel query
+        deployment_name: Name of the Azure OpenAI deployment (defaults to env var)
+        mode: Optional explicit mode override (bypasses classification)
+
+    Returns:
+        Tuple of (agent, mode_name) where:
+        - agent: Configured ToolCallingAgent optimized for the detected mode
+        - mode_name: The generation mode that was used (e.g., "itinerary")
+
+    Examples:
+        >>> agent, mode = create_travel_agent_for_query("Plan a 3-day trip to Chiang Mai")
+        >>> print(mode)  # "itinerary"
+        
+        >>> agent, mode = create_travel_agent_for_query(
+        ...     "What beaches should I visit?",
+        ...     mode="suggest_places"
+        ... )
+        >>> print(mode)  # "suggest_places"
+    """
+    # Use explicit mode if provided, otherwise classify
+    if mode:
+        generation_mode = get_mode_from_string(mode)
+        if not generation_mode:
+            # Invalid mode provided, classify instead
+            classification = classify_generation_mode(query)
+            mode_str = classification["generation_mode"]
+            generation_mode = get_mode_from_string(mode_str)
+    else:
+        classification = classify_generation_mode(query)
+        mode_str = classification["generation_mode"]
+        generation_mode = get_mode_from_string(mode_str)
+    
+    # Fallback to ITINERARY if classification fails
+    if not generation_mode:
+        generation_mode = GenerationMode.ITINERARY
+    
+    # Create mode-specific agent
+    agent = create_agent_for_mode(generation_mode, deployment_name)
+    
+    return agent, generation_mode.value

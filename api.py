@@ -3,9 +3,10 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
-from typing import Optional, List
+from typing import Optional, List, Dict
 import logging
-from agents import create_travel_agent
+from agents import create_travel_agent_for_query
+from agents.factory import GenerationMode, list_available_modes
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -27,27 +28,22 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize agent (singleton)
-agent = None
-
-def get_agent():
-    """Get or create travel agent instance."""
-    global agent
-    if agent is None:
-        agent = create_travel_agent()
-    return agent
+# Mode-specific agent cache
+agent_cache: Dict[str, object] = {}
 
 
 # Request/Response Models
 class TravelQuery(BaseModel):
     """Travel query request."""
     query: str = Field(..., description="Natural language travel query", min_length=1)
+    mode: Optional[str] = Field(None, description="Optional explicit generation mode override")
     max_tokens: Optional[int] = Field(None, description="Maximum tokens for response")
     
     class Config:
         json_schema_extra = {
             "example": {
-                "query": "plan hiking trip in Chiang Mai for 3 days"
+                "query": "plan hiking trip in Chiang Mai for 3 days",
+                "mode": "itinerary"
             }
         }
 
@@ -56,6 +52,7 @@ class TravelResponse(BaseModel):
     """Travel query response."""
     query: str
     response: str
+    mode: str
     success: bool = True
     error: Optional[str] = None
 
@@ -77,8 +74,6 @@ async def root():
 async def health():
     """Health check endpoint."""
     try:
-        # Test agent initialization
-        _ = get_agent()
         return HealthResponse(status="healthy")
     except Exception as e:
         logger.error(f"Health check failed: {e}")
@@ -90,6 +85,9 @@ async def query_travel_agent(request: TravelQuery):
     """
     Query the travel agent with a natural language request.
     
+    The agent automatically selects the best mode for your query,
+    or you can explicitly specify a mode using the 'mode' parameter.
+    
     Examples:
     - "suggest places to visit in Chiang Mai"
     - "plan hiking trip in Chiang Mai for 3 days"
@@ -99,8 +97,14 @@ async def query_travel_agent(request: TravelQuery):
     try:
         logger.info(f"Received query: {request.query}")
         
-        # Get agent and run query
-        travel_agent = get_agent()
+        # Create mode-specific agent
+        travel_agent, mode = create_travel_agent_for_query(
+            query=request.query,
+            mode=request.mode
+        )
+        logger.info(f"Using mode: {mode}")
+        
+        # Run query
         result = travel_agent.run(request.query)
         
         logger.info("Query processed successfully")
@@ -108,6 +112,7 @@ async def query_travel_agent(request: TravelQuery):
         return TravelResponse(
             query=request.query,
             response=result,
+            mode=mode,
             success=True
         )
         
@@ -116,22 +121,51 @@ async def query_travel_agent(request: TravelQuery):
         return TravelResponse(
             query=request.query,
             response="",
+            mode="error",
             success=False,
             error=str(e)
         )
 
 
+@app.get("/modes")
+async def list_modes():
+    """List available generation modes."""
+    try:
+        modes = list_available_modes()
+        return {"modes": modes}
+    except Exception as e:
+        logger.error(f"Failed to list modes: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/tools")
 async def list_tools():
-    """List available tools in the agent."""
+    """List all available tools across all modes."""
     try:
-        travel_agent = get_agent()
+        from agents.tools.travel_tools import (
+            extract_travel_query,
+            generate_travel_itinerary,
+            suggest_places,
+            describe_place,
+            plan_activity_focused_trip,
+            compare_places,
+        )
+        
+        all_tools = [
+            extract_travel_query,
+            generate_travel_itinerary,
+            suggest_places,
+            describe_place,
+            plan_activity_focused_trip,
+            compare_places,
+        ]
+        
         tools = [
             {
                 "name": tool.name,
                 "description": tool.description
             }
-            for tool in travel_agent.tools
+            for tool in all_tools
         ]
         return {"tools": tools}
     except Exception as e:
