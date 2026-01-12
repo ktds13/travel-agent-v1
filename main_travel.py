@@ -2,16 +2,21 @@
 
 import os
 from dotenv import load_dotenv
-from agents import create_travel_agent_for_query, create_travel_agent
+from agents.orchestrator import route_to_specialist
+
 load_dotenv()
 
 def main():
     """Run the Travel Agent interactive REPL."""
     print("=" * 80)
-    print("TRAVEL AGENT v2.0 - Mode-Based Agent System")
+    print("TRAVEL AGENT v3.0 - Orchestrated Specialist Agents")
     print("=" * 80)
-    print("Agent will automatically select the best mode for your query.")
-    print("Available modes: itinerary, suggest_places, describe_place, activity_focused, comparison")
+    print("Main agent routes your query to specialized agents:")
+    print("  • Itinerary Agent - Day-by-day travel planning")
+    print("  • Places Agent - Destination suggestions & descriptions")
+    print("  • Accommodation Agent - Hotels, hostels, resorts")
+    print("  • Activity Agent - Trip planning around activities")
+    print("  • Comparison Agent - Compare destinations side-by-side")
     print("\nType 'exit' or 'quit' to end the session.\n")
     
     deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME", "")
@@ -27,14 +32,14 @@ def main():
             if not query.strip():
                 continue
             
-            print("\nCreating mode-specific agent...")
-            #agent, mode = create_travel_agent_for_query(query, deployment_name)
-            #print(f"Mode detected: {mode}")
-            agent = create_travel_agent(deployment_name, max_steps=12)
+            print("\nRouting to specialist agent...")
             
+            # Use orchestrator to route to appropriate specialist
+            response, mode_used = route_to_specialist(query, deployment_name)
+            
+            print(f"\n[Handled by: {mode_used} agent]")
             print("\nTravel Agent:")
-            result = agent.run(query)
-            print(result)
+            print(response)
             print()
             
         except KeyboardInterrupt:

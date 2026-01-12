@@ -67,7 +67,14 @@ def classify_generation_mode(query: str) -> dict:
     result = llm.extract_json(response)
     
     # Ensure mode exists and is valid, default to itinerary
-    valid_modes = {"itinerary", "suggest_places", "describe_place", "activity_focused", "comparison"}
+    valid_modes = {
+        "itinerary",
+        "suggest_places",
+        "describe_place",
+        "activity_focused",
+        "comparison",
+        "find_accommodation"  # Added for hotel/hostel/resort search
+    }
     mode = result.get("generation_mode", "itinerary")
     
     if mode not in valid_modes:

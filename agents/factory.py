@@ -1,7 +1,7 @@
 """Agent Factory for creating mode-specific travel agents."""
 
 from enum import Enum
-from typing import Optional
+from typing import Optional, Callable
 from smolagents import ToolCallingAgent
 
 from core.models import get_azure_model
@@ -26,6 +26,13 @@ from .tools.accommodation_tools import (
     search_accommodations,
     find_accommodation_near_place,
     compare_accommodations,
+)
+from .generators import (
+    create_itinerary_agent,
+    create_places_agent,
+    create_accommodation_agent,
+    create_activity_agent,
+    create_comparison_agent,
 )
 
 
@@ -159,7 +166,7 @@ def list_available_modes() -> list[dict]:
     Examples:
         >>> modes = list_available_modes()
         >>> len(modes)
-        5
+        6
     """
     return [
         {
@@ -169,3 +176,49 @@ def list_available_modes() -> list[dict]:
         }
         for mode in GenerationMode
     ]
+
+
+# Standalone agent registry
+STANDALONE_AGENT_FACTORIES: dict[GenerationMode, Callable] = {
+    GenerationMode.ITINERARY: create_itinerary_agent,
+    GenerationMode.SUGGEST_PLACES: create_places_agent,
+    GenerationMode.DESCRIBE_PLACE: create_places_agent,  # Same agent handles both
+    GenerationMode.ACTIVITY_FOCUSED: create_activity_agent,
+    GenerationMode.COMPARISON: create_comparison_agent,
+    GenerationMode.FIND_ACCOMMODATION: create_accommodation_agent,
+}
+
+
+def create_standalone_agent(
+    mode: GenerationMode,
+    deployment_name: Optional[str] = None
+) -> ToolCallingAgent:
+    """
+    Create a standalone generation agent for a specific mode.
+    
+    This is the new recommended way to create agents. Each mode has its own
+    dedicated agent implementation in the generators/ module, making the
+    codebase more modular and maintainable.
+    
+    Args:
+        mode: The generation mode (from GenerationMode enum)
+        deployment_name: Name of the Azure OpenAI deployment (defaults to env var)
+    
+    Returns:
+        Standalone ToolCallingAgent instance for the specified mode
+    
+    Examples:
+        >>> agent = create_standalone_agent(GenerationMode.ITINERARY)
+        >>> response = agent.run("Plan a 3-day trip to Chiang Mai")
+        
+        >>> agent = create_standalone_agent(GenerationMode.FIND_ACCOMMODATION)
+        >>> response = agent.run("Find hotel near Doi Suthep")
+    """
+    if not isinstance(mode, GenerationMode):
+        raise ValueError(f"Invalid mode: {mode}. Must be a GenerationMode enum value.")
+    
+    factory = STANDALONE_AGENT_FACTORIES.get(mode)
+    if not factory:
+        raise ValueError(f"No standalone agent factory found for mode: {mode}")
+    
+    return factory(deployment_name)
