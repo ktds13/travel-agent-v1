@@ -101,7 +101,7 @@ def create_travel_agent_for_query(
     Returns:
         Tuple of (agent, mode_name) where:
         - agent: Configured ToolCallingAgent optimized for the detected mode
-        - mode_name: The generation mode that was used (e.g., "itinerary")
+        - mode_name: The generation mode that was used
 
     Examples:
         >>> agent, mode = create_travel_agent_for_query("Plan a 3-day trip to Chiang Mai")

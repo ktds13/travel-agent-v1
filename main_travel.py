@@ -2,7 +2,7 @@
 
 import os
 from dotenv import load_dotenv
-from agents import create_travel_agent_for_query
+from agents import create_travel_agent_for_query, create_travel_agent
 load_dotenv()
 
 def main():
@@ -28,8 +28,9 @@ def main():
                 continue
             
             print("\nCreating mode-specific agent...")
-            agent, mode = create_travel_agent_for_query(query, deployment_name)
-            print(f"Mode detected: {mode}")
+            #agent, mode = create_travel_agent_for_query(query, deployment_name)
+            #print(f"Mode detected: {mode}")
+            agent = create_travel_agent(deployment_name, max_steps=12)
             
             print("\nTravel Agent:")
             result = agent.run(query)

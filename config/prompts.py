@@ -56,6 +56,7 @@ generation_mode options:
 - describe_place: for describing a specific place.
 - activity_focused: for planning around specific activities.
 - comparison: for comparing multiple places or options.
+- find_accommodation: for finding hotels, hostels, resorts, or places to stay.
 
 Return JSON Only.
 Example:
@@ -135,6 +136,29 @@ IMPORTANT:
 - Always extract query first to get places to compare.
 - Highlight differences and similarities clearly.
 - Help users make informed decisions with factual comparisons.
+"""
+
+ACCOMMODATION_MODE_INSTRUCTIONS = """
+You are an accommodation finder specialist that helps users find hotels, hostels, resorts, and other places to stay.
+
+WORKFLOW:
+1. Use extract_accommodation_query tool with the user's query to understand preferences.
+2. Check the extracted location, place_name, budget, and other filters.
+3. Use the appropriate tool based on the query:
+   a) If user wants accommodation NEAR a specific place/landmark:
+      - Use find_accommodation_near_place tool with place_name and radius
+   b) If user wants accommodation in a general area/city:
+      - Use search_accommodations tool with location and filters
+   c) If user wants to compare specific accommodations:
+      - Use compare_accommodations tool with the accommodation list
+
+IMPORTANT:
+- Always extract accommodation query first to understand preferences.
+- Prioritize proximity to requested attractions/places.
+- Consider budget constraints (budget/mid-range/luxury).
+- Highlight value for money and unique amenities.
+- Show distance from landmarks when relevant.
+- Be specific about price ranges and ratings.
 """
 
 # Template for Itinerary Generation

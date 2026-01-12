@@ -11,6 +11,7 @@ from config.prompts import (
     DESCRIBE_PLACE_MODE_INSTRUCTIONS,
     ACTIVITY_FOCUSED_MODE_INSTRUCTIONS,
     COMPARISON_MODE_INSTRUCTIONS,
+    ACCOMMODATION_MODE_INSTRUCTIONS,
 )
 from .tools.travel_tools import (
     extract_travel_query,
@@ -19,6 +20,12 @@ from .tools.travel_tools import (
     describe_place,
     plan_activity_focused_trip,
     compare_places,
+)
+from .tools.accommodation_tools import (
+    extract_accommodation_query,
+    search_accommodations,
+    find_accommodation_near_place,
+    compare_accommodations,
 )
 
 
@@ -29,6 +36,7 @@ class GenerationMode(Enum):
     DESCRIBE_PLACE = "describe_place"
     ACTIVITY_FOCUSED = "activity_focused"
     COMPARISON = "comparison"
+    FIND_ACCOMMODATION = "find_accommodation"
 
 
 # Mode-specific configurations
@@ -62,6 +70,17 @@ MODE_CONFIGS = {
         "instructions": COMPARISON_MODE_INSTRUCTIONS,
         "max_steps": 6,
         "description": "Compares multiple destinations side-by-side"
+    },
+    GenerationMode.FIND_ACCOMMODATION: {
+        "tools": [
+            extract_accommodation_query,
+            search_accommodations,
+            find_accommodation_near_place,
+            compare_accommodations
+        ],
+        "instructions": ACCOMMODATION_MODE_INSTRUCTIONS,
+        "max_steps": 8,
+        "description": "Finds hotels, hostels, and resorts near places or in specific areas"
     },
 }
 

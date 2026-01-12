@@ -91,7 +91,7 @@ def generate_travel_itinerary(query: str, places: List[dict], days: Optional[int
     Args:
         query: The user's original travel request.
         places: List of places to include in the itinerary.
-        days: Number of days for the trip. Defaults to 3 if not provided.
+        days: Number of days for the trip. Defaults to 1 if not provided.
     
     Returns:
         str: A formatted travel itinerary in markdown.
@@ -109,10 +109,7 @@ def suggest_places(query: str, places: List[dict]) -> str:
     Suggest travel places based on user preferences.
     Returns a list of recommended places with brief descriptions.
     
-    Use this when user asks for suggestions like:
-    - "What places should I visit?"
-    - "Suggest some destinations"
-    - "Where can I go for..."
+    Use this when user asks for suggestions or recommendations.
 
     Args:
         query: The user's travel query.
@@ -142,10 +139,7 @@ def describe_place(place_name: str, places: List[dict]) -> str:
     Describe a specific travel place in detail.
     Provides information about activities, characteristics, and recommendations.
     
-    Use this when user asks about a specific place:
-    - "Tell me about [place]"
-    - "What can I do in [place]?"
-    - "Describe [place]"
+    Use this when user asks about a specific place.
 
     Args:
         place_name: Name of the place to describe.
