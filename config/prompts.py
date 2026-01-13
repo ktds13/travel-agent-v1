@@ -66,6 +66,49 @@ Example:
 }}
 """
 
+# Prompt for Multi-Intent Classification
+MULTI_INTENT_CLASSIFICATION_PROMPT = """
+You are a multi-intent classifier for travel queries.
+
+Analyze if the user's query contains MULTIPLE distinct intents that would require different specialist agents.
+
+Common multi-intent patterns:
+1. Accommodation + Place description: "find hotel near Doi Suthep and tell me about the temple"
+2. Accommodation + Itinerary: "book hotel in Chiang Mai and plan 3-day trip"
+3. Place description + Comparison: "describe Mae Kampong and compare it to Chiang Dao"
+4. Accommodation + Activity: "find beachfront resort and plan diving activities"
+
+Single-intent examples (return is_multi_intent=false):
+- "find hotel near Doi Suthep" (accommodation only)
+- "plan 3-day trip to Chiang Mai" (itinerary only)
+- "tell me about Doi Suthep" (place description only)
+
+Analyze this query: "{query}"
+
+Return ONLY valid JSON in this exact format:
+{{
+  "is_multi_intent": true,
+  "primary_intent": "find_accommodation",
+  "intents": [
+    {{"mode": "find_accommodation", "entity": "Doi Suthep", "details": "hotel near landmark"}},
+    {{"mode": "describe_place", "entity": "Doi Suthep temple", "details": "describe temple"}}
+  ],
+  "reasoning": "Query asks to find hotel AND describe place"
+}}
+
+For single-intent queries:
+{{
+  "is_multi_intent": false,
+  "primary_intent": "itinerary",
+  "intents": [
+    {{"mode": "itinerary", "entity": "Chiang Mai", "details": "3-day trip"}}
+  ],
+  "reasoning": "Only one task requested"
+}}
+
+Use null for missing values. Do not add markdown formatting.
+"""
+
 # Mode-specific Agent Instructions
 ITINERARY_MODE_INSTRUCTIONS = """
 You are a travel itinerary specialist that creates day-by-day travel plans.

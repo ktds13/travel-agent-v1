@@ -3,7 +3,7 @@
 from typing import Optional, Dict
 from smolagents import ToolCallingAgent
 from core.models import get_azure_model
-from utils.intent import classify_generation_mode
+from utils.intent import classify_generation_mode, classify_multi_intent
 from .generators import (
     create_itinerary_agent,
     create_places_agent,
@@ -11,6 +11,7 @@ from .generators import (
     create_activity_agent,
     create_comparison_agent
 )
+from .multi_orchestrator import create_multi_agent_orchestrator
 
 ORCHESTRATOR_INSTRUCTIONS = """
 You are the main travel assistant orchestrator that routes user requests to specialized agents.
@@ -34,6 +35,7 @@ The system will automatically route to the correct agent.
 
 # Agent cache to avoid recreating agents
 _agent_cache: Dict[str, ToolCallingAgent] = {}
+_multi_orchestrator_cache: Optional[ToolCallingAgent] = None
 
 
 def get_or_create_specialist(
@@ -148,6 +150,61 @@ def create_orchestrator(
 
 
 def clear_agent_cache():
-    """Clear the cached specialist agents. Useful for testing or reloading."""
-    global _agent_cache
+    """Clear the cached agents and multi-orchestrator."""
+    global _multi_orchestrator_cache
     _agent_cache.clear()
+    _multi_orchestrator_cache = None
+    
+
+
+def route_multi_intent(
+    query: str,
+    deployment_name: Optional[str] = None,
+    explicit_mode: Optional[str] = None
+) -> tuple[str, str]:
+    """
+    Route queries that may require multiple specialist agents.
+    
+    This function detects if a query contains multiple intents (e.g.,
+    "find hotel near Doi Suthep and describe the temple") and routes
+    accordingly:
+    - Multi-intent queries: Use multi-agent orchestrator
+    - Single-intent queries: Use direct specialist routing
+    
+    Args:
+        query: User's travel query
+        deployment_name: Azure OpenAI deployment name
+        explicit_mode: Optional explicit mode (bypasses multi-intent detection)
+    
+    Returns:
+        Tuple of (response, mode_used) where:
+        - response: The agent's response (from specialist or multi-orchestrator)
+        - mode_used: The generation mode or "multi-agent" if multiple intents
+        
+    Examples:
+        >>> route_multi_intent("find hotel near Doi Suthep and describe temple")
+        # Uses multi-agent orchestrator, returns ("...", "multi-agent")
+        
+        >>> route_multi_intent("plan 3-day trip to Chiang Mai")
+        # Uses single itinerary agent, returns ("...", "itinerary")
+    """
+    # If explicit mode provided, skip multi-intent detection
+    if explicit_mode:
+        return route_to_specialist(query, deployment_name, explicit_mode)
+    
+    # Detect multi-intent queries
+    classification = classify_multi_intent(query)
+    
+    if classification.get("is_multi_intent", False):
+        # Use multi-agent orchestrator
+        global _multi_orchestrator_cache
+        
+        if _multi_orchestrator_cache is None:
+            _multi_orchestrator_cache = create_multi_agent_orchestrator(deployment_name)
+        
+        response = _multi_orchestrator_cache.run(query)
+        return response, "multi-agent"
+    else:
+        # Single intent - route to specific specialist
+        primary_intent = classification.get("primary_intent", "itinerary")
+        return route_to_specialist(query, deployment_name, primary_intent)

@@ -1,7 +1,7 @@
 """Intent extraction utilities."""
 
 from core.llm import LLMService
-from config.prompts import INTENT_EXTRACTION_PROMPT, GENERATION_MODE_PROMPT
+from config.prompts import INTENT_EXTRACTION_PROMPT, GENERATION_MODE_PROMPT, MULTI_INTENT_CLASSIFICATION_PROMPT
 
 
 def extract_intent(query: str) -> dict:
@@ -84,3 +84,59 @@ def classify_generation_mode(query: str) -> dict:
         "generation_mode": mode,
         "days": result.get("days")
     }
+
+
+def classify_multi_intent(query: str) -> dict:
+    """
+    Detect if user query contains multiple intents requiring different specialist agents.
+    
+    This classifier identifies queries that ask for multiple tasks, such as:
+    - "find hotel near Doi Suthep and describe the temple" (accommodation + description)
+    - "plan 3-day trip and book resort" (itinerary + accommodation)
+    - "compare Chiang Mai and Bangkok and suggest hotels" (comparison + accommodation)
+    
+    Args:
+        query: User's travel query
+        
+    Returns:
+        Dict with:
+        - is_multi_intent (bool): True if multiple intents detected
+        - primary_intent (str): The main intent/mode
+        - intents (list): List of intent dicts with mode, entity, details
+        - reasoning (str): Explanation of classification
+        
+    Examples:
+        >>> classify_multi_intent("find hotel near Doi Suthep and tell me about the temple")
+        {
+            'is_multi_intent': True,
+            'primary_intent': 'find_accommodation',
+            'intents': [
+                {'mode': 'find_accommodation', 'entity': 'Doi Suthep', 'details': '...'},
+                {'mode': 'describe_place', 'entity': 'Doi Suthep temple', 'details': '...'}
+            ],
+            'reasoning': 'Query asks to find hotel AND describe place'
+        }
+        
+        >>> classify_multi_intent("plan 3-day trip to Chiang Mai")
+        {
+            'is_multi_intent': False,
+            'primary_intent': 'itinerary',
+            'intents': [{'mode': 'itinerary', 'entity': 'Chiang Mai', 'details': '3-day trip'}],
+            'reasoning': 'Only one task requested'
+        }
+    """
+    llm = LLMService()
+    
+    prompt = MULTI_INTENT_CLASSIFICATION_PROMPT.format(query=query)
+    response = llm.generate_with_prompt(prompt, temperature=0)
+    
+    result = llm.extract_json(response)
+    
+    # Validate and provide defaults
+    return {
+        "is_multi_intent": result.get("is_multi_intent", False),
+        "primary_intent": result.get("primary_intent", "itinerary"),
+        "intents": result.get("intents", []),
+        "reasoning": result.get("reasoning", "Classification completed")
+    }
+

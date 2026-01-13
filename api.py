@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict
 import logging
-from agents.orchestrator import route_to_specialist, get_or_create_specialist
+from agents.orchestrator import route_to_specialist, get_or_create_specialist, route_multi_intent
 from agents.factory import GenerationMode, list_available_modes, create_standalone_agent
 
 # Configure logging
@@ -15,8 +15,8 @@ logger = logging.getLogger(__name__)
 # Initialize FastAPI app
 app = FastAPI(
     title="Travel Agent API",
-    description="AI-powered travel planning API with orchestrated specialist agents",
-    version="3.0.0"
+    description="AI-powered travel planning API with orchestrated specialist agents and multi-intent support",
+    version="3.1.0"
 )
 
 # Add CORS middleware
@@ -85,12 +85,16 @@ async def query_travel_agent(request: TravelQuery):
     """
     Query the travel agent with a natural language request.
     
-    The orchestrator automatically routes your query to the appropriate specialist agent:
+    The orchestrator automatically routes your query to the appropriate specialist agent(s):
     - Itinerary Agent: For day-by-day trip planning
     - Places Agent: For destination suggestions and descriptions
     - Accommodation Agent: For hotels, hostels, and resorts
     - Activity Agent: For activity-focused trip planning
     - Comparison Agent: For comparing destinations
+    - Multi-Agent Orchestrator: For queries requiring multiple specialists
+    
+    Multi-intent queries (e.g., "find hotel near Doi Suthep and describe the temple")
+    are automatically detected and routed to the multi-agent orchestrator.
     
     You can optionally specify a mode to directly use a specific specialist.
     
@@ -100,12 +104,13 @@ async def query_travel_agent(request: TravelQuery):
     - "find hotel near Doi Suthep"
     - "tell me about Mae Kampong"
     - "compare Chiang Dao and Mae Kampong"
+    - "find hotel near Doi Suthep and tell me about the temple" (multi-intent)
     """
     try:
         logger.info(f"Received query: {request.query}")
         
-        # Use orchestrator to route to specialist
-        result, mode = route_to_specialist(
+        # Use multi-intent routing (auto-detects single vs multi-intent)
+        result, mode = route_multi_intent(
             query=request.query,
             explicit_mode=request.mode
         )

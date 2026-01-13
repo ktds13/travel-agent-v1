@@ -2,21 +2,25 @@
 
 import os
 from dotenv import load_dotenv
-from agents.orchestrator import route_to_specialist
+from agents.orchestrator import route_multi_intent
 
 load_dotenv()
 
 def main():
     """Run the Travel Agent interactive REPL."""
     print("=" * 80)
-    print("TRAVEL AGENT v3.0 - Orchestrated Specialist Agents")
+    print("TRAVEL AGENT v3.1 - Multi-Agent Orchestrator")
     print("=" * 80)
-    print("Main agent routes your query to specialized agents:")
+    print("Intelligent routing to specialized agents:")
     print("  • Itinerary Agent - Day-by-day travel planning")
     print("  • Places Agent - Destination suggestions & descriptions")
     print("  • Accommodation Agent - Hotels, hostels, resorts")
     print("  • Activity Agent - Trip planning around activities")
     print("  • Comparison Agent - Compare destinations side-by-side")
+    print("  • Multi-Agent Orchestrator - Complex multi-intent queries")
+    print("\nExamples:")
+    print("  - 'plan 3-day trip to Chiang Mai'")
+    print("  - 'find hotel near Doi Suthep and describe the temple' (multi-intent)")
     print("\nType 'exit' or 'quit' to end the session.\n")
     
     deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME", "")
@@ -32,12 +36,12 @@ def main():
             if not query.strip():
                 continue
             
-            print("\nRouting to specialist agent...")
+            print("\nAnalyzing query and routing to specialist(s)...")
             
-            # Use orchestrator to route to appropriate specialist
-            response, mode_used = route_to_specialist(query, deployment_name)
+            # Use multi-intent routing (auto-detects single vs multi-intent)
+            response, mode_used = route_multi_intent(query, deployment_name)
             
-            print(f"\n[Handled by: {mode_used} agent]")
+            print(f"\n[Handled by: {mode_used}]")
             print("\nTravel Agent:")
             print(response)
             print()

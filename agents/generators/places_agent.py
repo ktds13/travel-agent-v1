@@ -35,7 +35,9 @@ IMPORTANT:
 
 def create_places_agent(
     deployment_name: Optional[str] = None,
-    max_steps: int = 6
+    max_steps: int = 6,
+    name: Optional[str] = None,
+    description: Optional[str] = None
 ) -> ToolCallingAgent:
     """
     Create a standalone places suggestion agent.
@@ -46,6 +48,8 @@ def create_places_agent(
     Args:
         deployment_name: Name of the Azure OpenAI deployment (defaults to env var)
         max_steps: Maximum steps for the agent to take (default: 6)
+        name: Optional name for the agent (required when used as managed agent)
+        description: Optional description (required when used as managed agent)
     
     Returns:
         Configured ToolCallingAgent for place suggestions
@@ -62,7 +66,9 @@ def create_places_agent(
         model=model,
         tools=tools,
         instructions=PLACES_AGENT_INSTRUCTIONS,
-        max_steps=max_steps
+        max_steps=max_steps,
+        name=name,
+        description=description
     )
     
     return agent
